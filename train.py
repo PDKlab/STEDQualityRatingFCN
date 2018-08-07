@@ -230,11 +230,11 @@ if __name__ == '__main__':
         # Aggregate stats
         for key,func in zip(('trainMean', 'trainMed', 'trainMin', 'trainStd'),
                             (np.mean, np.median, np.min, np.std)):
-            stats[key] = np.sqrt(func(stLossTrain))
+            stats[key].append(np.sqrt(func(stLossTrain)))
         
         for key,func in zip(('testMean', 'testMed', 'testMin', 'testStd'),
                             (np.mean, np.median, np.min, np.std)):
-            stats[key] = np.sqrt(func(stLossTest))
+            stats[key].append(np.sqrt(func(stLossTest)))
 
         # Save the loss curves
         plt.figure(figsize=(12, 9))
@@ -269,7 +269,7 @@ if __name__ == '__main__':
                 "test":{
                         "names": stTestNames, "vals":stTestValues
                         }
-            }, open(os.path.join(args.outputfolder, 'bestNetworkPredictions.pkl', 'wb')))
+            }, open(os.path.join(args.outputfolder, 'bestNetworkPredictions.pkl'), 'wb'))
 
         _print("Epoch {} done!\n\tAvg loss train/validation : {} / {}".format(epoch, stats['trainMean'][-1], stats['testMean'][-1]))
 
