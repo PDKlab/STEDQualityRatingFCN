@@ -105,7 +105,7 @@ class DatasetLoader:
         minBatchNbr = np.ceil(len(self.listFiles) / self.bsize)
         newBatchSize = np.ceil(len(self.listFiles) / minBatchNbr)
         if self.bsize != newBatchSize:
-            print("Batch size changed from {} to {} to be even amongst mini-batches".format(self.bsize, newBatchSize))
+            print("Batch size changed from {} to {} to be even amongst mini-batches".format(self.bsize, newBatchSize))
         self.bsize = int(newBatchSize)
 
         # Set the position pointer at the beginning of the data
@@ -211,4 +211,4 @@ class DatasetLoader:
 
     def __len__(self):
         # The length of a dataset is defined by the number of batches it contains
-        return np.ceil(len(self.listFiles) / self.bsize)
+        return int(np.ceil(len(self.listFiles) / self.bsize))

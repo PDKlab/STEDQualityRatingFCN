@@ -151,19 +151,20 @@ if __name__ == '__main__':
 
     # Ensure that the BN layers momentum is set to a reasonable value
     for child in net.children():
-        if type(child) == nn.BatchNorm2d:
+        if type(child) == torch.nn.BatchNorm2d:
             child.momentum = 0.5
 
     # Set learning rate decay
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.lrdecay, gamma=0.5)
     
     _print("Create loss")
-    criterion = nn.MSELoss()
+    criterion = torch.nn.MSELoss()
     if args.cuda:
         criterion = criterion.cuda()
     minValidLoss = np.inf
 
     # Training loop
+    _print("Start training")
     for epoch in range(startEpoch, args.epochs):
         # Shuffle the train set
         dataTrain.newEpoch()
