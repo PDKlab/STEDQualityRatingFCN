@@ -24,4 +24,4 @@ RUN conda install scikit-image matplotlib flask && conda clean -ya
 WORKDIR /workspace
 RUN chmod -R a+w /workspace
 
-COPY . /workspace/executable
+COPY ../.. /workspace/executable
