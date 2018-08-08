@@ -67,31 +67,32 @@ python train.py <dataset folder> <output folder> --finetuneFrom=<path to a param
 
 ### Produce heatmaps for existing images
 
-TODO
+You can use the `produce_heatmaps.py` script, located in `results_processing`, with the following invocation:
+
+```shell
+python produce_heatmaps.py <dataset folder> <network folder> <output folder>
+```
+
+Where `dataset_folder` is a folder containing a `test` subfolder with NPZ files (see above), `network folder` a folder containing a `params.net` file and `output folder` the directory where to put the results. By default, the script also outputs colorbar and overall network prediction, but it can also output the sole heatmap by using the `--heatmaponly` flag.
 
 ## Using the server
 
-
+Prior to start the server, a trained model is needed. You can either use a pretrained model amongst the ones provided in `trained_models` or train one yourself (see previous section).
 
 ### Starting the server
 
-You have two choices to start the server:
+```shell
+docker run --rm -p <PORT>:5000 qnet /bin/bash -c "cd /workspace/executable/ && python server.py trained_models/<model>/params.net <experiment>"
+```
 
-1. Start with pre-installed trained models in the image:
+Where:
 
-    `docker run --rm -p 5000:5000 qnet /bin/bash -c "cd /workspace/executable/ && python server.py trained_models/<experiment> <name>"`
+* `<PORT>` is the port you want to use on your machine. You will need to remember this port number to connect the client in the next step.
+* `<model>` is the network you want to use (see the folders in `trained_models`). Alternatively, you may also use your own network by providing the path to its parameters checkpoint file.
+* `<experiment>` indicates which mean/std.dev to use to standardize the images. It can be *phalloidin* (e.g. Actin), *tubulin*, *CaMKII_Neuron*, *PSD95_Neuron*, *LifeAct_Neuron*, or *Membrane_Neuron*. Alternatively, if you use a new dataset, you may add its relevant statistics in `datasets_preparation/stats.txt` and provide the first field of the line added here.
 
-   - `<experiment>` is one of the three pre-installed experiment folder in `trained_models`.
-        - `alltrained` : the network has seen actin and tubulin proteins during training.
-        - `tubulin`: trained only on tubulin.
-        - `CaMKII_PSD95_Neuron`: trained on live imaging with CaMKII and PSD95 proteins.
-   - `<name>` is the identifier after `-` in the network's name. ex: in `best_model.t7-0`, `<name>`=`0`.
+Also note that you **must** pass the `--cuda` flag if you want the processing to be done on GPU.
 
-2. Start with your experiment, create a docker volume linking to your experiment folder: 
-
-   `docker run --rm -v "<my-experiment-folder>:/mnt/experiment" -p 5000:5000 qnet /bin/bash -c "cd /workspace/executable/ && python server.py /mnt/experiment <name>"`
-
-   - `<name>` is still the identifier after `-` in the network's name. ex: in `best_model.t7-0`, `<name>`=`0`
 
 ### Test with the client
 
