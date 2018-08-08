@@ -4,16 +4,12 @@ import json
 import datetime
 
 import numpy as np
-from scipy.misc import imsave
 
 import torch
 from torch.autograd import Variable
 
 from flask import Flask
 from flask import render_template, request
-
-import matplotlib
-from matplotlib import pyplot as plt
 
 from skimage import filters
 
@@ -81,7 +77,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     stats = open('stats.txt', 'r').read().split("\n")
-    model = NetTrueFCN(smallest=16)
+    model = NetTrueFCN()
     netParams = torch.load(args.modelpath)
     model.load_state_dict(netParams)
     if args.cuda:
@@ -101,8 +97,6 @@ if __name__ == '__main__':
         print("Invalid experiment!")
         exit()
 
-    logdir = os.path.join(logdirbase, args.experiment)
-    os.makedirs(logdir, exist_ok=True)
     min_, max_ = stats['min'], stats['max']
     thresholdType = args.maskthreshold
 
