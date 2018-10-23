@@ -25,8 +25,11 @@ import networks
 from loader import DatasetLoader
 
 
-def load(outputpath):
-    netParams = torch.load(os.path.join(outputpath, "params.net"))
+def load(outputpath, usecuda):
+    if not usecuda:
+        netParams = torch.load(os.path.join(outputpath, "params.net"), map_location='cpu')
+    else:
+        netParams = torch.load(os.path.join(outputpath, "params.net"))
     return netParams
 
 def createNet():

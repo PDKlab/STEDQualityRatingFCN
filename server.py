@@ -75,14 +75,18 @@ if __name__ == '__main__':
     parser.add_argument('experiment', help='Structure to use (tubulin, PSD95, etc., named exactly as the folder)', type=str)
     parser.add_argument('--maskthreshold', type=str, choices=["otsu", "li"], default="otsu", help="Thresholding algorithm for the mask")
     args = parser.parse_args()
+    useCuda = args.cuda
 
     stats = open('stats.txt', 'r').read().split("\n")
     model = NetTrueFCN()
-    netParams = torch.load(args.modelpath)
+    if useCuda:
+        netParams = torch.load(args.modelpath)
+    else:
+        # The models were trained on GPU, we have to map them on CPU
+        netParams = torch.load(args.modelpath, map_location='cpu')
     model.load_state_dict(netParams)
-    if args.cuda:
+    if useCuda:
         model = model.cuda()
-    useCuda = args.cuda
     model.eval()
     
     for lineS in stats:

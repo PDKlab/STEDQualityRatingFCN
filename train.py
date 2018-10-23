@@ -37,14 +37,19 @@ def _print(txt, level=1):
     print("{} [{:.2f}] {}".format(LEVELS[level], delay, txt))
     ptime = time.time()
 
-def load(outputpath):
+def load(outputpath, usecuda):
     # Load a network from a checkpoint folder
     # This folder must contain:
     #   - 'params.net': the parameters of the network to be restored
     #   - 'optimizer.data': the optimizer state
     #   - 'statsCkpt.pkl': the statistics and parameters of the run so far
-    netParams = torch.load(os.path.join(outputpath, "params.net"))
-    optimizerParams = torch.load(os.path.join(outputpath, "optimizer.data"))
+    if not usecuda:
+        # The models were trained on GPU, we have to map them on CPU
+        netParams = torch.load(os.path.join(outputpath, "params.net"), map_location='cpu')
+        optimizerParams = torch.load(os.path.join(outputpath, "optimizer.data"), map_location='cpu')
+    else:
+        netParams = torch.load(os.path.join(outputpath, "params.net"))
+        optimizerParams = torch.load(os.path.join(outputpath, "optimizer.data"))
     stats = pickle.load(open(os.path.join(outputpath, "statsCkpt.pkl"), 'rb'))
     return netParams, optimizerParams, stats
 
@@ -106,7 +111,7 @@ if __name__ == '__main__':
     _print("Create network and optimizer")
     if args.startFromCkpt:
         # We restart from an already existing checkpoint
-        netParams, optParams, stats = load(args.outputfolder)
+        netParams, optParams, stats = load(args.outputfolder, args.cuda)
         net = networks.NetTrueFCN()
         net.load_state_dict(netParams)
         if args.cuda:
