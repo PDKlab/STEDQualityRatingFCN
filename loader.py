@@ -4,6 +4,7 @@ Loader class definition
 
 import os
 import random
+import warnings
 from copy import deepcopy
 
 import numpy as np
@@ -67,7 +68,9 @@ class DatasetLoader:
         for lineS in stats:
             if len(lineS) < 4:
                 continue
-            if lineS.strip().split()[0] in self.root.split("/"):
+            # Caution : this line should be changed if the stats of the image data are too far
+            # from the phalloidin ones (mean, minimum, maximum, etc.)
+            if lineS.strip().split()[0] == "phalloidin":
                 self.stats = dict(zip(("mean", "std", "min", "max"), 
                                     [float(s) for s in lineS.strip().split()[1].split(",")]))
 
@@ -179,6 +182,14 @@ class DatasetLoader:
                     data[0] = rotate(data[0], rotation_amnt, mode='reflect')
                     data[1] = rotate(data[1].astype('float32'), rotation_amnt, mode='reflect') > 0.5
 
+            if data[0].shape[0] % 32 != 0:
+                warnings.warn("Image height must be a multiple of 32! Will crop the bottom of the image to ensure it.")
+                data[0] = data[0][:-(data[0].shape[0] % 32)]
+
+            if data[0].shape[1] % 32 != 0:
+                warnings.warn("Image width must be a multiple of 32! Will crop the right of the image to ensure it.")
+                data[0] = data[0][:, :-(data[0].shape[1] % 32)]
+            
             X.append(data[0])
             if int(fnamesplit[0]) in self.fixedscores:
                 y.append(self.fixedscores[int(fnamesplit[0])])
