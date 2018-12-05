@@ -77,7 +77,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     useCuda = args.cuda
 
-    stats = open('stats.txt', 'r').read().split("\n")
+    stats = open('datasets_preparation/stats.txt', 'r').read().split("\n")
     model = NetTrueFCN()
     if useCuda:
         netParams = torch.load(args.modelpath)
